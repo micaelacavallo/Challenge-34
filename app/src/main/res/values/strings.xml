@@ -7,6 +7,10 @@
     <string name="button_add_contact">Add</string>
     <string name="action_add_contact">Add contact</string>
     <string name="text_view_no_contacts">No contacts added yet.</string>
-    <string name="title_activity_add_contact">AddContactActivity</string>
+    <string name="title_activity_add_contact">Add new contact</string>
+    <string name="edit_text_first_name_hint">First Name</string>
+    <string name="edit_text_last_name_hint">Last Name</string>
+    <string name="edit_text_nickname_hint">Nickname</string>
+    <string name="button_done">Done</string>
 
 </resources>
