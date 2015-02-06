@@ -1,5 +1,7 @@
 package com.example.micaelacavallo.contacts;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
@@ -23,6 +25,8 @@ import java.util.List;
 public class ContactsFragment extends ListFragment {
     ArrayAdapter<Contact> mAdapter;
     DatabaseHelper mDBHelper = null;
+
+    private static final Integer REQUEST_CODE = 0;
     public ContactsFragment() {
     }
 
@@ -75,10 +79,8 @@ public class ContactsFragment extends ListFragment {
 
         switch (id){
             case R.id.action_add_contact:
-                Contact document = new Contact();
-                document.setFirstName("New doc");
-                document.setLastName("Nothing relevant");
-                mAdapter.add(document);
+                Intent intent = new Intent(getActivity(), AddContactActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
                 handled = true;
                 break;
         }
