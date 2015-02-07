@@ -64,12 +64,18 @@ public class ContactsFragment extends ListFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        prepareListView();
+        List<Contact> contacts;
+        try {
+            contacts = getDBHelper().getContactDao().queryForAll();
+        } catch (SQLException e) {
+            contacts = new ArrayList<>();
+            e.printStackTrace();
+        }
+        prepareListView(contacts);
     }
 
-    private void prepareListView() {
-        List<Contact> entries = new ArrayList<>();
-        mAdapter = new ContactAdapter(getActivity(), entries);
+    private void prepareListView(List<Contact> contacts) {
+        mAdapter = new ContactAdapter(getActivity(), contacts);
         setListAdapter(mAdapter);
     }
 
