@@ -2,6 +2,8 @@ package com.example.micaelacavallo.contacts;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,28 +57,26 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
             prepareViews(rowView);
             mTextViewName.setText(mContact.get(position).getFirstName() + " " + mContact.get(position).getLastName());
             mTextViewNickname.setText(mContact.get(position).getNickName());
-
-
-
-        }
-        }
-
-
-    @Override
-    public void add(Contact object) {
-        super.add(object);
-        try {
-            Dao<Contact, Integer> contactDao = mDBHelper.getContactDao();
-            contactDao.create(object);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            Bitmap bmp = getBitmap(position);
+            mImageViewPicture.setImageBitmap(bmp);
         }
     }
 
 
+    private Bitmap getBitmap(int position) {
+        Bitmap bmp;
+        byte[] image;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        image = mContact.get(position).getImage();
+        bmp = BitmapFactory.decodeByteArray(image, 0, image.length, options);
+        return bmp;
+    }
+
+
     private void prepareViews(View rowView) {
-        mTextViewName= (TextView)rowView.findViewById(R.id.text_view_contact_name);
-        mTextViewNickname = (TextView)rowView.findViewById(R.id.text_view_contact_nickname);
-        mImageViewPicture = (ImageView)rowView.findViewById(R.id.image_view_contact_picture);
+        mTextViewName = (TextView) rowView.findViewById(R.id.text_view_contact_name);
+        mTextViewNickname = (TextView) rowView.findViewById(R.id.text_view_contact_nickname);
+        mImageViewPicture = (ImageView) rowView.findViewById(R.id.image_view_contact_picture);
     }
 }
