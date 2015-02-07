@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.text.method.CharacterPickerDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,7 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -27,10 +30,9 @@ import java.util.List;
 public class ContactsFragment extends ListFragment {
     ContactAdapter mAdapter;
     DatabaseHelper mDBHelper = null;
-
-    private static final String LOG_TAG = ContactsFragment.class.getSimpleName();
-
+    public static final String ID = "id";
     private static final Integer REQUEST_CODE = 0;
+
     public ContactsFragment() {
     }
 
@@ -77,6 +79,16 @@ public class ContactsFragment extends ListFragment {
     private void prepareListView(List<Contact> contacts) {
         mAdapter = new ContactAdapter(getActivity(), contacts);
         setListAdapter(mAdapter);
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent (getActivity(), EditContactActivity.class);
+                intent.putExtra(ID, position);
+                startActivity(intent);
+
+            }
+        });
+
     }
 
 
@@ -112,7 +124,7 @@ public class ContactsFragment extends ListFragment {
             Dao<Contact,Integer> dao = getDBHelper().getContactDao();
             dao.create(contact);
         } catch (SQLException e) {
-            Log.e(LOG_TAG, "Failed to create DAO CONTACT.", e);
+            e.printStackTrace();
         }
 
     }

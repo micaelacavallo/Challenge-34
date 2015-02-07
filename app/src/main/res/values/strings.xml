@@ -12,5 +12,6 @@
     <string name="edit_text_last_name_hint">Last Name</string>
     <string name="edit_text_nickname_hint">Nickname (optional)</string>
     <string name="button_done">Done</string>
+    <string name="title_activity_edit_contact">Edit contact</string>
 
 </resources>

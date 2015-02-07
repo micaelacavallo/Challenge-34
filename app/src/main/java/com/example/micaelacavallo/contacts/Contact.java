@@ -62,4 +62,8 @@ public class Contact {
     public void setNickName(String mNickName) {
         this.mNickName = mNickName;
     }
+
+    public int getId() {
+        return id;
+    }
 }
