@@ -9,7 +9,8 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:id="@+id/image_view_contact_picture"
-        android:background="@drawable/contact" />
+        android:background="@drawable/contact"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -22,7 +23,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
             android:id="@+id/text_view_contact_name"
-            android:paddingTop="20dp"
+            android:paddingTop="17dp"
             android:paddingLeft="30dp" />
 
         <TextView

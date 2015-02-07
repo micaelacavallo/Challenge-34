@@ -22,15 +22,13 @@ import java.util.List;
 public class ContactAdapter extends ArrayAdapter<Contact> {
 
     List<Contact> mContact;
-    DatabaseHelper mDBHelper;
     TextView mTextViewName;
     TextView mTextViewNickname;
     ImageView mImageViewPicture;
 
-    public ContactAdapter(Context context, DatabaseHelper dbHelper, List<Contact> contact) {
-        super(context, R.layout.list_item_entry, contact);
-        mContact = contact;
-        mDBHelper = dbHelper;
+    public ContactAdapter(Context context, List<Contact> contacts) {
+        super(context, R.layout.list_item_entry, contacts);
+        mContact = contacts;
     }
 
     @Override

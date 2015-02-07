@@ -12,8 +12,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:id="@+id/image_button_picture"
-        android:background="@drawable/contact"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/contact" />
 
     <EditText
         android:layout_width="match_parent"
@@ -42,7 +43,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/edit_text_nickname"
         android:hint="@string/edit_text_nickname_hint"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:gravity="center_horizontal"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
