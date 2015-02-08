@@ -1,12 +1,9 @@
 package com.example.micaelacavallo.contacts;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.text.method.CharacterPickerDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
@@ -31,7 +27,8 @@ public class ContactsFragment extends ListFragment {
     ContactAdapter mAdapter;
     DatabaseHelper mDBHelper = null;
     public static final String ID = "id";
-    private static final Integer REQUEST_CODE = 0;
+    private static final Integer ADD_CONTACT = 0;
+    private static final Integer EDIT_CONTACT = 1;
 
     public ContactsFragment() {
     }
@@ -84,9 +81,8 @@ public class ContactsFragment extends ListFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent (getActivity(), EditContactActivity.class);
                 intent.putExtra(ID, position);
-                startActivity(intent);
-
-            }
+                startActivityForResult(intent, EDIT_CONTACT);
+           }
         });
 
     }
@@ -95,17 +91,22 @@ public class ContactsFragment extends ListFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE)
+        if (resultCode == getActivity().RESULT_OK)
         {
-            if (resultCode == getActivity().RESULT_OK)
+            String firstname = data.getStringExtra(Contact.FIRST_NAME);
+            String lastname = data.getStringExtra(Contact.LAST_NAME);
+            String nickname = data.getStringExtra(Contact.NICKNAME);
+            byte[] image = data.getByteArrayExtra(Contact.PICTURE);
+            if (requestCode == ADD_CONTACT)
             {
-                String firstname = data.getStringExtra(Contact.FIRST_NAME);
-                String lastname = data.getStringExtra(Contact.LAST_NAME);
-                String nickname = data.getStringExtra(Contact.NICKNAME);
-                byte[] image = data.getByteArrayExtra(Contact.PICTURE);
                 Contact contact = getContact(firstname, lastname, nickname, image);
                 mAdapter.add(contact);
                 saveContact(contact);
+                Toast.makeText(getActivity(), R.string.message_contact_added, Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+
             }
         }
     }
@@ -149,7 +150,7 @@ public class ContactsFragment extends ListFragment {
         switch (id){
             case R.id.action_add_contact:
                 Intent intent = new Intent(getActivity(), AddContactActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
+                startActivityForResult(intent, ADD_CONTACT);
                 handled = true;
                 break;
         }

@@ -13,5 +13,7 @@
     <string name="edit_text_nickname_hint">Nickname (optional)</string>
     <string name="button_done">Done</string>
     <string name="title_activity_edit_contact">Edit contact</string>
+    <string name="message_contact_added">The contact has been added correctly.</string>
+    <string name="button_delete">Delete</string>
 
 </resources>
