@@ -59,6 +59,7 @@ public class AddContactFragment extends Fragment {
         ID = getActivity().getIntent().getIntExtra(ContactsFragment.ID, ID);
         if (ID != 0) {
             mButtonDelete.setVisibility(View.VISIBLE);
+            mButtonDone.setText("Update");
             getContact(ID);
         }
         return rootView;
