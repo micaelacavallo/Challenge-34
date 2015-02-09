@@ -18,22 +18,33 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+
 import java.io.ByteArrayOutputStream;
+import java.sql.SQLException;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class AddContactFragment extends Fragment {
+
     ImageButton mImageButtonPicture;
     byte[] mPictureArray;
     Button mButtonDone;
+    Button mButtonDelete;
     EditText mEditTextFirstName;
     EditText mEditTextLastName;
     EditText mEditTextNickname;
+
     Bitmap mPhoto;
 
-    private static int REQUEST_IMAGE_CAPTURE = 1;
+    DatabaseHelper mDBHelper = null;
 
+    Contact mContact;
+    public static String DELETE_CONTACT = "delete_contact";
+    private static int REQUEST_IMAGE_CAPTURE = 1;
+    int ID = 0;
     public AddContactFragment() {
     }
 
@@ -43,17 +54,48 @@ public class AddContactFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_add_contact, container, false);
         prepareEditTexts(rootView);
         prepareImageButton(rootView);
-        prepareButtonDone(rootView);
+        prepareButtons(rootView);
+
+        ID = getActivity().getIntent().getIntExtra(ContactsFragment.ID, ID);
+        if (ID != 0) {
+            mButtonDelete.setVisibility(View.VISIBLE);
+            getContact(ID);
+        }
         return rootView;
     }
 
-    private void prepareButtonDone(View rootView) {
+    private void getContact(int id) {
+        Dao<Contact, Integer> daoContact;
+        try {
+            daoContact = getDBHelper().getContactDao();
+            mContact = daoContact.queryForId(id);
+            setTextsAndPicture(mContact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setTextsAndPicture (Contact contact) {
+        mEditTextFirstName.setText(contact.getFirstName());
+        mEditTextLastName.setText(contact.getLastName());
+        mEditTextNickname.setText(contact.getNickName());
+        mPhoto = BitmapFactory.decodeByteArray(contact.getImage(), 0, contact.getImage().length);
+        mImageButtonPicture.setImageBitmap(mPhoto);
+    }
+
+    private void prepareButtons(View rootView) {
         mButtonDone = (Button)rootView.findViewById(R.id.button_done);
-        mButtonDone.setOnClickListener(new View.OnClickListener() {
+        mButtonDelete = (Button)rootView.findViewById(R.id.button_delete);
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Activity activity = getActivity();
                 Intent intent = putIntentExtras();
+                if (v == mButtonDone) {
+                    intent.putExtra(DELETE_CONTACT, false);
+                } else {
+                    intent.putExtra(DELETE_CONTACT, true);
+                }
                 activity.setResult(Activity.RESULT_OK, intent);
                 activity.finish();
             }
@@ -63,11 +105,15 @@ public class AddContactFragment extends Fragment {
                 intent.putExtra(Contact.FIRST_NAME, mEditTextFirstName.getText().toString());
                 intent.putExtra(Contact.LAST_NAME, mEditTextLastName.getText().toString());
                 intent.putExtra(Contact.NICKNAME, mEditTextNickname.getText().toString());
+                intent.putExtra(Contact.ID, ID);
                 convertBitmapImageToByteArray();
                 intent.putExtra(Contact.PICTURE, mPictureArray);
                 return intent;
             }
-        });
+        };
+
+        mButtonDone.setOnClickListener(listener);
+        mButtonDelete.setOnClickListener(listener);
     }
 
     private void prepareEditTexts(View rootView) {
@@ -116,7 +162,7 @@ public class AddContactFragment extends Fragment {
         });
     }
 
-    private void convertBitmapImageToByteArray() {
+    public void convertBitmapImageToByteArray() {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         mPhoto.compress(Bitmap.CompressFormat.PNG, 100, stream);
         mPictureArray = stream.toByteArray();
@@ -129,6 +175,22 @@ public class AddContactFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
             mPhoto = (Bitmap) data.getExtras().get("data");
             mImageButtonPicture.setImageBitmap(mPhoto);
+        }
+    }
+
+    public DatabaseHelper getDBHelper() {
+        if (mDBHelper == null){
+            mDBHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+        }
+        return mDBHelper;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mDBHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDBHelper = null;
         }
     }
 }

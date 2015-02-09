@@ -26,6 +26,7 @@ import java.util.List;
 public class ContactsFragment extends ListFragment {
     ContactAdapter mAdapter;
     DatabaseHelper mDBHelper = null;
+    Contact mContactToEdit;
     public static final String ID = "id";
     private static final Integer ADD_CONTACT = 0;
     private static final Integer EDIT_CONTACT = 1;
@@ -64,13 +65,19 @@ public class ContactsFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         List<Contact> contacts;
+        contacts = getContactsFromBD();
+        prepareListView(contacts);
+    }
+
+    private List<Contact> getContactsFromBD() {
+        List<Contact> contacts;
         try {
             contacts = getDBHelper().getContactDao().queryForAll();
         } catch (SQLException e) {
             contacts = new ArrayList<>();
             e.printStackTrace();
         }
-        prepareListView(contacts);
+        return contacts;
     }
 
     private void prepareListView(List<Contact> contacts) {
@@ -79,14 +86,14 @@ public class ContactsFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent (getActivity(), EditContactActivity.class);
-                intent.putExtra(ID, position);
+                Intent intent = new Intent (getActivity(), AddContactActivity.class);
+                mContactToEdit = mAdapter.getItem(position);
+                intent.putExtra(ID,mAdapter.getItem(position).getId());
                 startActivityForResult(intent, EDIT_CONTACT);
            }
         });
 
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -97,17 +104,38 @@ public class ContactsFragment extends ListFragment {
             String lastname = data.getStringExtra(Contact.LAST_NAME);
             String nickname = data.getStringExtra(Contact.NICKNAME);
             byte[] image = data.getByteArrayExtra(Contact.PICTURE);
+            //int id = 0;
+            //id = data.getIntExtra(Contact.ID, id);
+
+            String message = "";
             if (requestCode == ADD_CONTACT)
             {
                 Contact contact = getContact(firstname, lastname, nickname, image);
-                mAdapter.add(contact);
                 saveContact(contact);
-                Toast.makeText(getActivity(), R.string.message_contact_added, Toast.LENGTH_LONG).show();
+                mAdapter.add(contact);
+               message = "The contact has been created correctly";
             }
             else
             {
+                if (data.getBooleanExtra(AddContactFragment.DELETE_CONTACT, true)) {
+                    deleteContact(mContactToEdit);
+                    message = "The contact has been deleted correctly";
 
+                }
+                else {
+                    mContactToEdit.setFirstName(firstname);
+                    mContactToEdit.setLastName(lastname);
+                    mContactToEdit.setNickName(nickname);
+                    mContactToEdit.setImage(image);
+                    editContact(mContactToEdit);
+                    message = "The contact has been modified correctly";
+                }
             }
+            mAdapter.clear();
+            List<Contact> contacts = getContactsFromBD();
+            mAdapter = new ContactAdapter(getActivity(), contacts);
+            setListAdapter(mAdapter);
+            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -120,6 +148,16 @@ public class ContactsFragment extends ListFragment {
         return contact;
     }
 
+    private void editContact (Contact contact)
+    {
+        try {
+            Dao<Contact,Integer> dao = getDBHelper().getContactDao();
+            dao.update(contact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void saveContact(Contact contact) {
         try {
             Dao<Contact,Integer> dao = getDBHelper().getContactDao();
@@ -127,7 +165,15 @@ public class ContactsFragment extends ListFragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
+    private void deleteContact(Contact contact) {
+        try {
+            Dao<Contact,Integer> dao = getDBHelper().getContactDao();
+            dao.delete(contact);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
